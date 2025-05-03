@@ -58,7 +58,7 @@ export default function LoginScreen() {
     <ScrollView style={[styles.container, { backgroundColor }]} contentContainerStyle={styles.contentContainer}>
       <StatusBar style={isDark ? "light" : "dark"} />
       <View style={styles.logoContainer}>
-        <Image source={require("../../assets/drone-logo.png")} style={styles.logo} />
+        <Image source={require("../../assets/drone-logo.png")} style={styles.logo} resizeMode="cover"/>
         <Text style={[styles.welcomeText, { color: "#30D5C8" }]}>Welcome!</Text>
         <Text style={[styles.subtitleText, { color: isDark ? "#aaa" : "#666" }]}>
           Hello, please sign in to continue!

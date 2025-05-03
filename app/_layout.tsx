@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { Stack } from "expo-router"
 // import { useSafeScreenProps } from "../hooks/useSafeScreenProps"
-
+import { JourneyProvider } from "@/context/journeyContext"
 import { StatusBar } from "expo-status-bar"
 import { useFonts } from "expo-font"
 import * as SplashScreen from "expo-splash-screen"
@@ -31,6 +31,7 @@ export default function RootLayout() {
   }
 
   return (
+    <JourneyProvider>
     <SafeAreaProvider>
     {/* <GestureHandlerRootView style={{ flex: 1 }}> */}
       <ThemeProvider>
@@ -54,5 +55,6 @@ export default function RootLayout() {
       </ThemeProvider>
     {/* </GestureHandlerRootView> */}
     </SafeAreaProvider>
+    </JourneyProvider>
   )
 }

@@ -38,20 +38,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logo: {
-    width: 150,
-    height: 150,
+    width: 200,
+    height: 200,
     marginBottom: 20,
   },
   title: {
-    fontSize: 32,
+    fontSize: 40,
     fontWeight: "bold",
     color: "#fff",
     fontFamily: "Inter-Bold",
   },
   subtitle: {
-    fontSize: 16,
-    color: "#fff",
-    opacity: 0.8,
+    fontSize: 20,
+    color: "white",
+    opacity: 1,
+    textAlign: "center",
     fontFamily: "Inter-Regular",
   },
 })

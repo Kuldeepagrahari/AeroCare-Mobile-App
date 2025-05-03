@@ -5,7 +5,7 @@ import { useColorScheme } from "react-native"
 import { ChevronLeft, Heart, Share2, Star } from "lucide-react-native"
 import { useState } from "react"
 import { useRouter } from "expo-router"
-
+import ScreenWrapper from '@/components/ScreenWrapper';
 export default function DetailScreen() {
   const colorScheme = useColorScheme()
   const isDark = colorScheme === "dark"
@@ -14,10 +14,11 @@ export default function DetailScreen() {
   const [quantity, setQuantity] = useState(1)
 
   return (
+    <ScreenWrapper>
     <View style={[styles.container, { backgroundColor: isDark ? "#121212" : "#f5f5f5" }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.imageContainer}>
-          <Image source={require("../../assets/drone-logo.png")} style={styles.image} resizeMode="cover" />
+          <Image source={require("../../assets/drone_msg.png")} style={styles.image} resizeMode="contain" />
           <View style={styles.imageOverlay}>
             <TouchableOpacity
               style={[styles.backButton, { backgroundColor: isDark ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.5)" }]}
@@ -44,70 +45,7 @@ export default function DetailScreen() {
         </View>
 
         <View style={[styles.contentContainer, { backgroundColor: isDark ? "#1e1e1e" : "#fff" }]}>
-          {/* <View style={styles.header}>
-            <Text style={[styles.title, { color: isDark ? "#fff" : "#000" }]}>Premium Product</Text>
-            <Text style={[styles.price, { color: isDark ? "#fff" : "#000" }]}>$129.99</Text>
-          </View>
-
-          <View style={styles.ratingContainer}>
-            <View style={styles.stars}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  size={16}
-                  color={star <= 4 ? "#ffc107" : isDark ? "#444" : "#ddd"}
-                  fill={star <= 4 ? "#ffc107" : "transparent"}
-                />
-              ))}
-            </View>
-            <Text style={[styles.ratingText, { color: isDark ? "#ccc" : "#666" }]}>4.0 (120 reviews)</Text>
-          </View>
-
-          <Text style={[styles.sectionTitle, { color: isDark ? "#fff" : "#000" }]}>Description</Text>
-          <Text style={[styles.description, { color: isDark ? "#ccc" : "#666" }]}>
-            This premium product is designed with high-quality materials to ensure durability and performance. It
-            features an elegant design that complements any style and comes with a 1-year warranty. Perfect for everyday
-            use, this product will exceed your expectations.
-          </Text>
-
-          <Text style={[styles.sectionTitle, { color: isDark ? "#fff" : "#000" }]}>Specifications</Text>
-          <View style={styles.specContainer}>
-            <View style={styles.specItem}>
-              <Text style={[styles.specLabel, { color: isDark ? "#ccc" : "#666" }]}>Material</Text>
-              <Text style={[styles.specValue, { color: isDark ? "#fff" : "#000" }]}>Premium</Text>
-            </View>
-            <View style={styles.specItem}>
-              <Text style={[styles.specLabel, { color: isDark ? "#ccc" : "#666" }]}>Weight</Text>
-              <Text style={[styles.specValue, { color: isDark ? "#fff" : "#000" }]}>7-8Kg</Text>
-            </View>
-            <View style={styles.specItem}>
-              <Text style={[styles.specLabel, { color: isDark ? "#ccc" : "#666" }]}>Dimensions</Text>
-              <Text style={[styles.specValue, { color: isDark ? "#fff" : "#000" }]}>10 x 5 x 2 cm</Text>
-            </View>
-            <View style={styles.specItem}>
-              <Text style={[styles.specLabel, { color: isDark ? "#ccc" : "#666" }]}>Warranty</Text>
-              <Text style={[styles.specValue, { color: isDark ? "#fff" : "#000" }]}>1 Year</Text>
-            </View>
-          </View>
-
-          <View style={styles.quantityContainer}>
-            <Text style={[styles.quantityLabel, { color: isDark ? "#fff" : "#000" }]}>Quantity</Text>
-            <View style={styles.quantityControls}>
-              <TouchableOpacity
-                style={[styles.quantityButton, { backgroundColor: isDark ? "#333" : "#e0e0e0" }]}
-                onPress={() => setQuantity(Math.max(1, quantity - 1))}
-              >
-                <Text style={[styles.quantityButtonText, { color: isDark ? "#fff" : "#000" }]}>-</Text>
-              </TouchableOpacity>
-              <Text style={[styles.quantityValue, { color: isDark ? "#fff" : "#000" }]}>{quantity}</Text>
-              <TouchableOpacity
-                style={[styles.quantityButton, { backgroundColor: isDark ? "#333" : "#e0e0e0" }]}
-                onPress={() => setQuantity(quantity + 1)}
-              >
-                <Text style={[styles.quantityButtonText, { color: isDark ? "#fff" : "#000" }]}>+</Text> */}
-              {/* </TouchableOpacity> */}
-            {/* </View> */}
-          {/* </View> */}
+      
           <View style={styles.header}>
   <Text style={[styles.title, { color: isDark ? "#fff" : "#000" }]}>VTOL Drone</Text>
   <Text style={[styles.price, { color: isDark ? "#fff" : "#000" }]}>3,00,000/-</Text>
@@ -151,7 +89,7 @@ export default function DetailScreen() {
   </View>
   <View style={styles.specItem}>
     <Text style={[styles.specLabel, { color: isDark ? "#ccc" : "#666" }]}>Terrain Adaptation</Text>
-    <Text style={[styles.specValue, { color: isDark ? "#fff" : "#000" }]}>High Altitude,Snow Capable</Text>
+    <Text style={[styles.specValue, { color: isDark ? "#fff" : "#000" }]}>High Altitude</Text>
   </View>
   <View style={styles.specItem}>
     <Text style={[styles.specLabel, { color: isDark ? "#ccc" : "#666" }]}>Material</Text>
@@ -182,11 +120,12 @@ export default function DetailScreen() {
       </ScrollView>
 
       <View style={[styles.footer, { backgroundColor: isDark ? "#1e1e1e" : "#fff" }]}>
-        <TouchableOpacity style={[styles.addToCartButton, { backgroundColor: "#4CAF50" }]}>
-          <Text style={styles.addToCartText}>Add to Cart - ${(129.99 * quantity).toFixed(2)}</Text>
+        <TouchableOpacity style={[styles.addToCartButton, { backgroundColor: "#30D5C8" }]}>
+          <Text style={styles.addToCartText}>Add to Cart - {(300000 * quantity)} /- </Text>
         </TouchableOpacity>
       </View>
     </View>
+    </ScreenWrapper>
   )
 }
 
@@ -346,7 +285,7 @@ const styles = StyleSheet.create({
   addToCartText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "900",
     fontFamily: "Inter-Medium",
   },
 })

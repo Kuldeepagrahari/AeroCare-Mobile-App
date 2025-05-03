@@ -7,7 +7,7 @@ import { StatusBar } from "expo-status-bar"
 import { useTheme } from "@/components/ThemeProvider"
 import MapViewAlternative from "@/components/MapViewAlternate"
 import { Ionicons } from "@expo/vector-icons"
-
+import { useJourney } from "@/context/journeyContext"
 interface TelemetryData {
   range: string
   battery: number
@@ -19,6 +19,18 @@ interface TelemetryData {
 }
 
 export default function TrackingScreen() {
+  const { isJourneyStarted } = useJourney()
+  
+  if (!isJourneyStarted) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ color: "black", fontWeight: "800", fontSize: 40, textAlign: "center" }}>
+          Journey not started yet
+        </Text>
+        <Text style={{ color: "black" }}>Please start a journey</Text>
+      </View>
+    );
+  }
   const { isDark } = useTheme()
   const backgroundColor = isDark ? "#121212" : "#fff"
   const textColor = isDark ? "#fff" : "#333"
@@ -51,7 +63,7 @@ export default function TrackingScreen() {
   const droneMarkerAnim = useRef(new Animated.Value(0)).current
 
   useEffect(() => {
-    Animated.loop(
+    const animation = Animated.loop(
       Animated.sequence([
         Animated.timing(droneMarkerAnim, {
           toValue: 1,
@@ -64,7 +76,10 @@ export default function TrackingScreen() {
           useNativeDriver: true,
         }),
       ])
-    ).start()
+    );
+    animation.start()
+  
+    return () => animation.stop(); // cleanup to avoid multiple loops
   }, [])
 
   
@@ -78,7 +93,7 @@ export default function TrackingScreen() {
     useEffect(() => {
       const interval = setInterval(() => {
         fetchTelemetry();
-      }, 1000);
+      }, 2000);
     
       return () => clearInterval(interval);
     }, []);
@@ -94,16 +109,36 @@ export default function TrackingScreen() {
             const { horizontalSpeed, verticalSpeed, battery, currLatti, currLongi, currAltitude } = latestTelemetry
             const { sourceLatti, sourceLongi, destiLatti, destiLongi, temperature } = configurations
 
-            setTelemetry({
-              range: calculateDistance(currLatti || sourceLatti, currLongi || sourceLongi, destiLatti, destiLongi),
-              battery,
-              temperature,
-              altitude: currAltitude,
-              horizontalSpeed,
-              verticalSpeed,
-              status: "In Transit",
-            })
-
+            // setTelemetry({
+            //   range: calculateDistance(currLatti || sourceLatti, currLongi || sourceLongi, destiLatti, destiLongi),
+            //   battery,
+            //   temperature,
+            //   altitude: currAltitude,
+            //   horizontalSpeed,
+            //   verticalSpeed,
+            //   status: "In Transit",
+            // })
+            setTelemetry(prev => {
+              const newTelemetry = {
+                range: calculateDistance(currLatti || sourceLatti, currLongi || sourceLongi, destiLatti, destiLongi),
+                battery,
+                temperature,
+                altitude: currAltitude,
+                horizontalSpeed,
+                verticalSpeed,
+                status: "In Transit",
+              };
+            
+              if (JSON.stringify(prev) !== JSON.stringify(newTelemetry)) {
+                return newTelemetry;
+              }
+              return prev;
+            });
+            
+            setPath([{
+              latitude: currLatti,
+              longitude: currLongi,
+            }])
             if (currLatti && currLongi) {
               setPosition({ latitude: currLatti, longitude: currLongi })
             }
@@ -143,9 +178,9 @@ return (
     <StatusBar style={isDark ? "light" : "dark"} />
     <View style={styles.header}>
     <Text style={[styles.headerTitle, { color: accentColor }]}>Drone Live Tracking</Text>
-  </View>
+    </View>
 
-  <View style={styles.mapContainer}>
+ <View style={styles.mapContainer}>
     <MapViewAlternative
     style={styles.map}
     center={centerRef.current}
@@ -217,13 +252,7 @@ return (
             <Text style={[styles.telemetryValue, { color: textColor }]}>{telemetry.verticalSpeed.toFixed(2)} m/s</Text>
           </View>
         </View>
-{/* 
-        <View style={styles.telemetryRow}>
-          <View style={[styles.telemetryItem, { backgroundColor: cardBackgroundColor }]}>
-            <Text style={[styles.telemetryLabel, { color: secondaryTextColor }]}>Vertical Speed</Text>
-            <Text style={[styles.telemetryValue, { color: textColor }]}>{telemetry.verticalSpeed.toFixed(2)} m/s</Text>
-          </View>
-        </View> */}
+
 
         <View style={styles.statusContainer}>
           <Text style={[styles.statusTitle, { color: textColor }]}>Delivery Status</Text>
@@ -251,9 +280,12 @@ return (
             <Ionicons name="time" size={20} color={accentColor} />
             <Text style={[styles.estimatedTimeText, { color: textColor }]}>Estimated arrival in 15 minutes</Text>
           </View>
-        </View>
+        </View> 
       </ScrollView>
-    </View>
+      </View>
+     
+
+
   )
 }
 
@@ -388,21 +420,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Inter-Regular",
   },
-  header: {
-    padding: 20,
-    paddingTop: Platform.OS === "ios" ? 50 : 30,
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    fontFamily: "Inter-Bold",
-  },
-  mapContainer: {
-    height: 300,
-    width: "100%",
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
+ 
 })

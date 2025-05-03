@@ -5,8 +5,12 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, Platform }
 import { router } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import Slider from "@react-native-community/slider"
+import ScreenWrapper from '@/components/ScreenWrapper';
+import { useJourney } from "@/context/journeyContext";
 
 export default function CommandScreen() {
+  const { isJourneyStarted } = useJourney();
+  const {journey_end} = useJourney()
   const [mode, setMode] = useState("Hover")
   const [temperature, setTemperature] = useState(5.0)
   const [loading, setLoading] = useState(false)
@@ -52,6 +56,7 @@ export default function CommandScreen() {
         .then((response) => {
           setLoading(false)
           if (response.ok) {
+            journey_end()
             Alert.alert("Journey Ended", "Hopefully, You made a Successful Journey! We will wait for the next one!", [
               { text: "OK", onPress: () => router.replace("/(tabs)/home") },
             ])
@@ -82,10 +87,11 @@ export default function CommandScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper>
+   {isJourneyStarted ?<> <View style={styles.container}>
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Control VTOL</Text>
+
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Temperature Control</Text>
@@ -106,7 +112,7 @@ export default function CommandScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>VTOL Mode</Text>
+          <Text style={styles.sectionTitle}>Current Mode</Text>
           <Text style={styles.modeValue}>{mode}</Text>
         </View>
 
@@ -123,13 +129,7 @@ export default function CommandScreen() {
         </View>
 
         <View style={styles.actionButtonsContainer}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.emergencyButton]}
-            onPress={handleRTL}
-            disabled={loading}
-          >
-            <Text style={styles.actionButtonText}>Emergency Landing</Text>
-          </TouchableOpacity>
+         
 
           <TouchableOpacity
             style={[styles.actionButton, styles.landingButton]}
@@ -146,9 +146,20 @@ export default function CommandScreen() {
           >
             <Text style={styles.actionButtonText}>End the Journey</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.emergencyButton]}
+            onPress={handleRTL}
+            disabled={loading}
+          >
+            <Text style={styles.actionButtonText}>Execute FailSafe</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </View></> : <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ color: "black", fontWeight:"800", fontSize:40, textAlign:"center" }}>Journey not started yet</Text>
+        <Text style={{ color: "black"}}>Please start a journey</Text>
+      </View>}
+    </ScreenWrapper>
   )
 }
 
@@ -194,7 +205,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#30D5C8",
     marginLeft: 20,
-    width: 50,
+    width: 80,
     fontFamily: "Inter-Bold",
   },
   modeValue: {

@@ -19,6 +19,7 @@ import { useTheme } from "@/components/ThemeProvider"
 import { Ionicons } from "@expo/vector-icons"
 import MapViewAlternative from "@/components/MapViewAlternate"
 import { GOOGLE_MAPS_API_KEY } from "@/constants/ApiKeys"
+import { useJourney } from "@/context/journeyContext";
 
 // Define the form data interface
 interface FormData {
@@ -35,6 +36,7 @@ interface FormData {
 }
 
 export default function LocationScreen() {
+  const { startJourney } = useJourney();
   const { isDark } = useTheme()
   const backgroundColor = isDark ? "#121212" : "#fff"
   const textColor = isDark ? "#fff" : "#333"
@@ -250,18 +252,22 @@ export default function LocationScreen() {
           destiLatti: formData.toLat,
         }),
       })
+  
+
 
       const data = await response.json()
+ 
 
       setLoading(false)
 
-      if (response.ok && data.success) {
+      if (response.ok) {
         setFeasibilityChecked(true)
         setBtnTitle("Go Ahead")
       } else {
         Alert.alert(
           "Feasibility Check Failed",
-          `We can't cover this much distance\nBattery: ${data.batterySoC}%\nDistance: ${data.distance.toFixed(2)} km`,
+          `We can't cover this much distance\nBattery: ${data.batterySoC}%\nDistance: ${data.distance?.toFixed(2)} km ${data}`,
+       
         )
       }
     } catch (error) {
@@ -320,6 +326,7 @@ export default function LocationScreen() {
       setLoading(false)
 
       if (response.ok) {
+        startJourney()
         router.push("/booking/confirmed")
       } else {
         Alert.alert("Error", "Failed to start journey")

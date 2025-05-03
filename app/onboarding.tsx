@@ -12,31 +12,31 @@ const slides = [
     id: "1",
     title: "Welcome to AeroCare!",
     description: "Revolutionizing medical deliveries with drones. Faster, safer, and smarter healthcare logistics.",
-    image: require("@/assets/onboarding1.png"),
+    image: require("@/assets/drone_msg.png"),
   },
   {
     id: "2",
     title: "Deliver Life-Saving Essentials",
     description: "From organs to vaccines, ensure critical supplies reach their destination on time.",
-    image: require("../assets/onboarding2.png"),
+    image: require("../assets/drone_msg.png"),
   },
   {
     id: "3",
     title: "Track Your Drones Live",
     description: "Monitor drone routes, payload status, and ETAs with precision. For Real Time Tracking turn on live location.",
-    image: require("../assets/onboarding3.png"),
+    image: require("../assets/drone_msg.png"),
   },
   {
     id: "4",
     title: "Control Made Easy",
     description: "Schedule, prioritize, and manage all deliveries with just a few taps.",
-    image: require("../assets/onboarding4.png"),
+    image: require("../assets/drone_msg.png"),
   },
   {
     id: "5",
     title: "Let's Save Lives Together",
     description: "Get started and redefine healthcare logistics.",
-    image: require("../assets/onboarding5.png"),
+    image: require("../assets/drone_msg.png"),
   },
 ]
 
@@ -73,13 +73,13 @@ export default function OnboardingScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <Text style={styles.headerTitle}>AeroCare</Text>
         <Text style={styles.headerSubtitle}>Swift. Safe. Life-Saving Deliveries</Text>
-      </View>
+      </View> */}
 
       <View style={styles.imageContainer}>
-        <Image source={currentSlide.image} style={styles.image} resizeMode="contain" />
+        <Image source={currentSlide.image} style={styles.image} />
       </View>
 
       {renderPagination()}

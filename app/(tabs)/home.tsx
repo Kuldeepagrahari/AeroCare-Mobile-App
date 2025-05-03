@@ -7,7 +7,7 @@ import DroneStats from "@/components/DroneStats"
 import { useTheme } from "@/components/ThemeProvider"
 import { Ionicons } from "@expo/vector-icons"
 import BottomNavigation from "@/components/BottomNavigation"
-
+import ScreenWrapper from '@/components/ScreenWrapper';
 export default function HomeScreen() {
   const { isDark } = useTheme()
   const backgroundColor = isDark ? "#121212" : "#fff"
@@ -31,6 +31,7 @@ export default function HomeScreen() {
   }
 
   return (
+    <ScreenWrapper>
     <View style={[styles.container, { backgroundColor }]}>
       <StatusBar style={isDark ? "light" : "dark"} />
       <View style={[styles.header, { borderBottomColor: borderColor }]}>
@@ -44,23 +45,24 @@ export default function HomeScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.droneTitle}>
+        {/* <View style={styles.droneTitle}>
           <Text style={[styles.droneTitleText, { color: textColor }]}>{drone.name}</Text>
           <Text style={[styles.droneDescription, { color: secondaryTextColor }]}>{drone.description}</Text>
-        </View>
+        </View> */}
 
         <View style={styles.droneImageContainer}>
-          <Image source={require("../../assets/drone-model.png")} style={styles.droneImage} resizeMode="contain" />
-          <Text style={styles.droneModel}>{drone.model}</Text>
+       
+          <Image source={require("../../assets/drone_msg.png")} style={styles.droneImage} resizeMode="cover" />
+        
         </View>
 
-        <View style={styles.batteryContainer}>
+        {/* <View style={styles.batteryContainer}>
           <Text style={[styles.batteryLabel, { color: textColor }]}>Battery</Text>
           <View style={[styles.batteryBar, { backgroundColor: isDark ? "#333" : "#eee" }]}>
             <View style={[styles.batteryLevel, { width: `${drone.battery}%` }]} />
             <Text style={styles.batteryPercentage}>{drone.battery}%</Text>
           </View>
-        </View>
+        </View> */}
 
         <DroneStats battery={drone.battery} speed={drone.speed} range={drone.range} wind={drone.wind} />
 
@@ -70,6 +72,7 @@ export default function HomeScreen() {
       </ScrollView>
       {/* <BottomNavigation active="home" /> */}
     </View>
+    </ScreenWrapper>
   )
 }
 
@@ -116,15 +119,16 @@ const styles = StyleSheet.create({
   },
   droneImageContainer: {
     alignItems: "center",
-    marginVertical: 30,
+    marginBottom: 30,
+    height:160
   },
   droneImage: {
     width: 200,
     height: 200,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   droneModel: {
-    fontSize: 16,
+    fontSize: 25,
     color: "#30D5C8",
     fontWeight: "500",
     fontFamily: "Inter-Medium",
@@ -138,7 +142,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Medium",
   },
   batteryBar: {
-    height: 10,
+    height: 20,
     borderRadius: 5,
     overflow: "hidden",
     position: "relative",
@@ -157,8 +161,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     textAlign: "center",
-    lineHeight: 10,
-    fontSize: 8,
+    lineHeight: 17,
+    fontSize: 15,
     fontWeight: "bold",
     color: "#fff",
     fontFamily: "Inter-Bold",
@@ -168,7 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 15,
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 0,
     marginBottom: 80,
   },
   scheduleButtonText: {
