@@ -109,15 +109,7 @@ export default function TrackingScreen() {
             const { horizontalSpeed, verticalSpeed, battery, currLatti, currLongi, currAltitude } = latestTelemetry
             const { sourceLatti, sourceLongi, destiLatti, destiLongi, temperature } = configurations
 
-            // setTelemetry({
-            //   range: calculateDistance(currLatti || sourceLatti, currLongi || sourceLongi, destiLatti, destiLongi),
-            //   battery,
-            //   temperature,
-            //   altitude: currAltitude,
-            //   horizontalSpeed,
-            //   verticalSpeed,
-            //   status: "In Transit",
-            // })
+      
             setTelemetry(prev => {
               const newTelemetry = {
                 range: calculateDistance(currLatti || sourceLatti, currLongi || sourceLongi, destiLatti, destiLongi),
@@ -255,7 +247,7 @@ return (
 
 
         <View style={styles.statusContainer}>
-          <Text style={[styles.statusTitle, { color: textColor }]}>Delivery Status</Text>
+          {/* <Text style={[styles.statusTitle, { color: textColor }]}>Delivery Status</Text> */}
 
           <View style={styles.statusTracker}>
             <View style={styles.statusStep}>
@@ -306,6 +298,7 @@ const styles = StyleSheet.create({
   mapContainer: {
     height: 300,
     width: "100%",
+    marginBottom: 10
   },
   map: {
     ...StyleSheet.absoluteFillObject,
@@ -350,12 +343,12 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Bold",
   },
   statusContainer: {
-    padding: 15,
-    marginTop: 10,
+    padding: 0,
+    marginTop: 0,
     marginBottom: 80,
   },
   statusTitle: {
-    fontSize: 18,
+    fontSize: 12,
     fontWeight: "bold",
     marginBottom: 20,
     fontFamily: "Inter-Bold",

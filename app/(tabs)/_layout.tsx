@@ -30,8 +30,8 @@ export default function TabLayout() {
           height: 60,
           right: 16,
           backgroundColor: 'white',
-          borderRadius: 20,
-          borderWidth: 3,
+          borderRadius: 30,
+          borderWidth: 5,
 
           borderColor: '#30D5C8',
           padding:"10%",
@@ -42,7 +42,7 @@ export default function TabLayout() {
           shadowOffset: {width: 5, height: 5},
           shadowRadius: 10,
         },
-        tabBarActiveTintColor: "black",      // Active icon & text color
+        tabBarActiveTintColor: "#30D5C8",      // Active icon & text color
         tabBarInactiveTintColor: "#999",       // Inactive icon & text color
         tabBarLabelStyle: {
           fontSize: 10,

@@ -70,6 +70,24 @@ export default function LocationScreen() {
     altitude: "",
     emergencyAction: "Land",
   })
+  // const GetStartingLocation = async () => {
+  //   try {
+  //     const res = await fetch("https://vtol-server.onrender.com/api/telemetry/from");
+  //     if(res.ok) {
+  //       const data = await res.json()
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         fromLat: data.droneLatti,
+  //         fromLng: data.droneLongi,
+  //       }))
+  //     }
+  //   } catch (error) {
+  //     Alert.alert("Error", "Failed to get starting location")
+  //   }
+  // }
+  // useEffect(() => {
+  //   GetStartingLocation()}
+  // , [])
 
   // Handle input changes
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -112,12 +130,7 @@ export default function LocationScreen() {
               .filter(Boolean)
               .join(", ")
 
-            setFormData((prev) => ({
-              ...prev,
-              fromLocation: formattedAddress,
-              fromLat: userCoord.latitude,
-              fromLng: userCoord.longitude,
-            }))
+         
           }
         } catch (error) {
           console.log("Error getting address:", error)
@@ -133,7 +146,8 @@ export default function LocationScreen() {
 
     getCurrentLocation()
   }, [])
-
+ 
+  
   // Search for a location using Google Places API
   const searchLocation = async (query: string, isDestination: boolean) => {
     if (!query.trim()) return
@@ -437,6 +451,7 @@ export default function LocationScreen() {
               onChangeText={(text) => handleInputChange("toLocation", text)}
               onSubmitEditing={() => searchLocation(formData.toLocation, true)}
             />
+         
             <Text style={[styles.inputHint, { color: isDark ? "#aaa" : "#666" }]}>
               Enter location and press return to search, or tap on the map
             </Text>

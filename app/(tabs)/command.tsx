@@ -5,15 +5,18 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, Platform }
 import { router } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import Slider from "@react-native-community/slider"
+import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import ScreenWrapper from '@/components/ScreenWrapper';
 import { useJourney } from "@/context/journeyContext";
 
 export default function CommandScreen() {
   const { isJourneyStarted } = useJourney();
   const {journey_end} = useJourney()
-  const [mode, setMode] = useState("Hover")
+  const [mode, setMode] = useState("Drone is ready to Takeoff")
   const [temperature, setTemperature] = useState(5.0)
   const [loading, setLoading] = useState(false)
+  const [takeoff, setTakeoff] = useState(false)
+  const [hover, setHover] = useState(false)
 
   const handleEmergencyLanding = async () => {
     try {
@@ -48,30 +51,41 @@ export default function CommandScreen() {
   const handleEndJourney = async () => {
     try {
       setLoading(true)
+      Alert.alert("Are you sure!", "Do you want to end the journey?", [
+        { text: "Cancel", onPress: () => setLoading(false), style: "cancel" },
+        {
+          text: "OK",
+          onPress: () => {
+            // Proceed with ending the journey
+            fetch("https://vtol-server.onrender.com/api/telemetry/end", {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+            })
+              .then((response) => {
+                setLoading(false)
+                if (response.ok) {
+                  journey_end()
+                  Alert.alert("Journey Ended", "Hopefully, You made a Successful Journey! We will wait for the next one!", [
+                    { text: "OK", onPress: () => router.replace("/(tabs)/home") },
+                  ])
+                } else {
+                  Alert.alert("Error", "Failed to end journey")
+                }
+              })
+              .catch((error) => {
+                setLoading(false)
+                console.error("End journey API call failed:", error)
+                // For demo purposes, we'll proceed anyway
+                Alert.alert("Journey Ended", "Hopefully, You made a Successful Journey! We will wait for the next one!", [
+                  { text: "OK", onPress: () => router.replace("/(tabs)/home") },
+                ])
+              })
+          },
+        },
+      ]
+      )
       // In a real app, you would make an API call here
-      fetch("https://vtol-server.onrender.com/api/telemetry/end", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      })
-        .then((response) => {
-          setLoading(false)
-          if (response.ok) {
-            journey_end()
-            Alert.alert("Journey Ended", "Hopefully, You made a Successful Journey! We will wait for the next one!", [
-              { text: "OK", onPress: () => router.replace("/(tabs)/home") },
-            ])
-          } else {
-            Alert.alert("Error", "Failed to end journey")
-          }
-        })
-        .catch((error) => {
-          setLoading(false)
-          console.error("End journey API call failed:", error)
-          // For demo purposes, we'll proceed anyway
-          Alert.alert("Journey Ended", "Hopefully, You made a Successful Journey! We will wait for the next one!", [
-            { text: "OK", onPress: () => router.replace("/(tabs)/home") },
-          ])
-        })
+     
     } catch (error) {
       setLoading(false)
       console.error("Error ending journey:", error)
@@ -87,83 +101,238 @@ export default function CommandScreen() {
   }
 
   return (
-    <ScreenWrapper>
-   {isJourneyStarted ?<> <View style={styles.container}>
-      <StatusBar style="dark" />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+  //   <ScreenWrapper>
+  //  {isJourneyStarted ?<> <View style={styles.container}>
+  //     <StatusBar style="dark" />
+  //     <ScrollView contentContainerStyle={styles.scrollContent}>
 
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Temperature Control</Text>
-          <View style={styles.temperatureContainer}>
-            <Slider
-              style={styles.slider}
-              minimumValue={0}
-              maximumValue={10}
-              step={0.1}
-              value={temperature}
-              onValueChange={(value) => setTemperature(Number.parseFloat(value.toFixed(1)))}
-              minimumTrackTintColor="#30D5C8"
-              maximumTrackTintColor="#ddd"
-              thumbTintColor="#30D5C8"
-            />
-            <Text style={styles.temperatureValue}>{temperature}°C</Text>
-          </View>
-        </View>
+  //       <View style={styles.section}>
+  //         <Text style={styles.sectionTitle}>Temperature Control</Text>
+  //         <View style={styles.temperatureContainer}>
+  //           <Slider
+  //             style={styles.slider}
+  //             minimumValue={0}
+  //             maximumValue={10}
+  //             step={0.1}
+  //             value={temperature}
+  //             onValueChange={(value) => setTemperature(Number.parseFloat(value.toFixed(1)))}
+  //             minimumTrackTintColor="#30D5C8"
+  //             maximumTrackTintColor="#ddd"
+  //             thumbTintColor="#30D5C8"
+  //           />
+  //           <Text style={styles.temperatureValue}>{temperature}°C</Text>
+  //         </View>
+  //       </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Current Mode</Text>
-          <Text style={styles.modeValue}>{mode}</Text>
-        </View>
+  //       <View style={styles.section}>
+          
+  //         <Text style={styles.modeValue}>{mode}</Text>
+  //       </View>
 
-        <View style={styles.modeButtonsContainer}>
-          {["Takeoff", "Float", "Hover", "AltHold"].map((m) => (
-            <TouchableOpacity
-              key={m}
-              style={[styles.modeButton, mode === m && styles.activeModeButton]}
-              onPress={() => handleModeChange(m)}
-            >
-              <Text style={styles.modeButtonText}>{m}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+      
+  //       <View style={styles.modeButtonsContainer}>
+  //      {!takeoff ? <TouchableOpacity
+              
+  //             style={[styles.modeButton, mode === "Takeoff" && styles.activeModeButton]}
+  //             onPress={() => {handleModeChange("Takeoff"); setTakeoff(true)}}
+  //           >
+  //             <Text style={styles.modeButtonText}>{"Takeoff"}</Text>
+  //       </TouchableOpacity> : null}
+  //     {!hover ? <TouchableOpacity
+              
+  //             style={[styles.modeButton, mode === "Hovering" && styles.activeModeButton]}
+  //             onPress={() => {handleModeChange("Hovering"); setHover(true)}}
+  //           >
+  //             <Text style={styles.modeButtonText}>{"Hover"}</Text>
+  //       </TouchableOpacity> :
+  //       <TouchableOpacity
+              
+  //             style={[styles.modeButton, mode === "On the way " && styles.activeModeButton]}
+  //             onPress={() => {handleModeChange("On the way"); setHover(false)}}
+  //           >
+  //             <Text style={styles.modeButtonText}>Resume</Text>
+  //       </TouchableOpacity>}
+      
+  //    </View>
 
-        <View style={styles.actionButtonsContainer}>
+
+  //       <View style={styles.actionButtonsContainer}>
          
 
-          <TouchableOpacity
-            style={[styles.actionButton, styles.landingButton]}
-            onPress={handleEmergencyLanding}
-            disabled={loading}
-          >
-            <Text style={styles.actionButtonText}>Landing</Text>
-          </TouchableOpacity>
+  //         <TouchableOpacity
+  //           style={[styles.actionButton, styles.landingButton]}
+  //           onPress={handleEmergencyLanding}
+  //           disabled={loading}
+  //         >
+  //           <Text style={styles.actionButtonText}>Landing</Text>
+  //         </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.actionButton, styles.endJourneyButton]}
-            onPress={handleEndJourney}
-            disabled={loading}
-          >
-            <Text style={styles.actionButtonText}>End the Journey</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.emergencyButton]}
-            onPress={handleRTL}
-            disabled={loading}
-          >
-            <Text style={styles.actionButtonText}>Execute FailSafe</Text>
-          </TouchableOpacity>
+  //         <TouchableOpacity
+  //           style={[styles.actionButton, styles.endJourneyButton]}
+  //           onPress={handleEndJourney}
+  //           disabled={loading}
+  //         >
+  //           <Text style={styles.actionButtonText}>End the Journey</Text>
+  //         </TouchableOpacity>
+  //         <TouchableOpacity
+  //           style={[styles.actionButton, styles.emergencyButton]}
+  //           onPress={handleRTL}
+  //           disabled={loading}
+  //         >
+  //           <Text style={styles.actionButtonText}>Execute FailSafe</Text>
+  //         </TouchableOpacity>
+  //       </View>
+  //     </ScrollView>
+  //   </View></> : <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+  //       <Text style={{ color: "black", fontWeight:"800", fontSize:40, textAlign:"center" }}>Journey not started yet</Text>
+  //       <Text style={{ color: "black"}}>Please start a journey</Text>
+  //     </View>}
+  //   </ScreenWrapper>
+  <ScreenWrapper>
+      {isJourneyStarted ? (
+        <View style={styles.container}>
+          <StatusBar style="dark" />
+           <View style={styles.header}>
+              <Text style={[styles.headerTitle, { color: "#30D5C8" }]}>Drone Live Tracking</Text>
+           </View>
+          
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            
+            <View style={styles.section}>
+              {/* <Text style={styles.sectionTitle}>Temperature Control</Text> */}
+              <View style={styles.temperatureContainer}>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={0}
+                  maximumValue={10}
+                  step={0.1}
+                  value={temperature}
+                  onValueChange={(value) =>
+                    setTemperature(Number.parseFloat(value.toFixed(1)))
+                  }
+                  minimumTrackTintColor="#30D5C8"
+                  maximumTrackTintColor="#ddd"
+                  thumbTintColor="#30D5C8"
+                />
+                <Text style={styles.temperatureValue}>{temperature}°C</Text>
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.modeValue}>{mode}</Text>
+            </View>
+
+            <View style={styles.modeButtonsContainer}>
+              {!takeoff ? (
+                <TouchableOpacity
+                  style={[
+                    styles.modeButton,
+                    mode === 'Takeoff' && styles.activeModeButton,
+                  ]}
+                  onPress={() => {
+                    handleModeChange('Takeoff');
+                    setTakeoff(true);
+                  }}
+                >
+                  <MaterialIcons name="flight-takeoff" size={20} color="white" />
+                  <Text style={styles.modeButtonText}> Takeoff</Text>
+                </TouchableOpacity>
+              ) : null}
+
+              {!hover ? (
+                <TouchableOpacity
+                  style={[
+                    styles.modeButton,
+                    mode === 'Hovering' && styles.activeModeButton,
+                  ]}
+                  onPress={() => {
+                    handleModeChange('Hovering');
+                    setHover(true);
+                  }}
+                >
+                  <Ionicons name="pause-circle" size={20} color="white" />
+                  <Text style={styles.modeButtonText}> Hover</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={[
+                    styles.modeButton,
+                    mode === 'On the way' && styles.activeModeButton,
+                  ]}
+                  onPress={() => {
+                    handleModeChange('On the way');
+                    setHover(false);
+                  }}
+                >
+                  <Ionicons name="play-circle" size={20} color="white" />
+                  <Text style={styles.modeButtonText}> Resume</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <View style={styles.actionButtonsContainer}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.landingButton]}
+                onPress={handleEmergencyLanding}
+                disabled={loading}
+              >
+                <MaterialIcons name="flight-land" size={20} color="white" />
+                <Text style={styles.actionButtonText}> Landing</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.actionButton, styles.endJourneyButton]}
+                onPress={handleEndJourney}
+                disabled={loading}
+              >
+                <Ionicons name="stop-circle" size={20} color="white" />
+                <Text style={styles.actionButtonText}> End the Journey</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.actionButton, styles.emergencyButton]}
+                onPress={handleRTL}
+                disabled={loading}
+              >
+                <MaterialIcons name="warning" size={20} color="white" />
+                <Text style={styles.actionButtonText}> Execute FailSafe</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
         </View>
-      </ScrollView>
-    </View></> : <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ color: "black", fontWeight:"800", fontSize:40, textAlign:"center" }}>Journey not started yet</Text>
-        <Text style={{ color: "black"}}>Please start a journey</Text>
-      </View>}
+      ) : (
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Text
+            style={{
+              color: 'black',
+              fontWeight: '800',
+              fontSize: 40,
+              textAlign: 'center',
+            }}
+          >
+            Journey not started yet
+          </Text>
+          <Text style={{ color: 'black' }}>Please start a journey</Text>
+        </View>
+      )}
     </ScreenWrapper>
   )
 }
 
 const styles = StyleSheet.create({
+  header: {
+    padding: 20,
+    paddingTop: Platform.OS === "ios" ? 50 : 30,
+    alignItems: "center",
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    fontFamily: "Inter-Bold",
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -209,7 +378,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Bold",
   },
   modeValue: {
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: "bold",
     color: "#30D5C8",
     textAlign: "center",
@@ -229,6 +398,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     margin: 10,
+    flexDirection: "row",
   },
   activeModeButton: {
     elevation: 5,
@@ -236,6 +406,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 5, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
+    flexDirection: "row",
   },
   modeButtonText: {
     color: "#fff",
@@ -244,28 +415,33 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Medium",
   },
   actionButtonsContainer: {
-    marginTop: 20,
+    marginTop: 0,
   },
   actionButton: {
-    paddingVertical: 14,
+    paddingVertical: 25,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 15,
+    flexDirection: "row",
+  
   },
   emergencyButton: {
     backgroundColor: "#FF5252",
+    fontWeight:800
   },
   landingButton: {
     backgroundColor: "#30D5C8",
+    fontWeight:800
   },
   endJourneyButton: {
     backgroundColor: "#4CAF50",
+    fontWeight:800
   },
   actionButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "800",
     fontFamily: "Inter-Medium",
   },
 })
