@@ -70,24 +70,7 @@ export default function LocationScreen() {
     altitude: "",
     emergencyAction: "Land",
   })
-  // const GetStartingLocation = async () => {
-  //   try {
-  //     const res = await fetch("https://vtol-server.onrender.com/api/telemetry/from");
-  //     if(res.ok) {
-  //       const data = await res.json()
-  //       setFormData((prev) => ({
-  //         ...prev,
-  //         fromLat: data.droneLatti,
-  //         fromLng: data.droneLongi,
-  //       }))
-  //     }
-  //   } catch (error) {
-  //     Alert.alert("Error", "Failed to get starting location")
-  //   }
-  // }
-  // useEffect(() => {
-  //   GetStartingLocation()}
-  // , [])
+
 
   // Handle input changes
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -98,32 +81,30 @@ export default function LocationScreen() {
   useEffect(() => {
     const getCurrentLocation = async () => {
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync()
-        if (status !== "granted") {
-          Alert.alert("Permission Denied", "Location permission is required for this feature.")
-          return
-        }
+      
+       
+        // setLoading(true)
+        const location = await fetch("https://vtol-server.onrender.com/api/telemetry/from")
 
-        setLoading(true)
-        const location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        })
-
-        const userCoord = {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        }
+       if(location.ok) {
+          const data = await location.json()
+          const initialData = data.initialDroneData
+          if(initialData.droneLatti === 0 && initialData.droneLongi === 0){
+            return Alert.alert("Drone is Off", "Please turn on the drone to Start the Journey")
+          }
 
         setMapCenter({
-          latitude: userCoord.latitude,
-          longitude: userCoord.longitude,
+          latitude: initialData.droneLatti,
+          longitude: initialData.droneLongi,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         })
 
         // Get address from coordinates
         try {
-          const addresses = await Location.reverseGeocodeAsync(userCoord)
+          const addresses = await Location.reverseGeocodeAsync({
+            latitude: initialData.droneLatti,
+            longitude: initialData.droneLongi})
           if (addresses && addresses.length > 0) {
             const address = addresses[0]
             const formattedAddress = [address.name, address.street, address.city, address.region, address.country]
@@ -131,12 +112,19 @@ export default function LocationScreen() {
               .join(", ")
 
          
+          
+            setFormData((prev) => ({
+              ...prev,
+              fromLocation: formattedAddress,
+              fromLat: initialData.droneLatti,
+              fromLng: initialData.droneLongi,
+            }))
           }
         } catch (error) {
           console.log("Error getting address:", error)
         }
 
-        setLoading(false)
+        setLoading(false)}
       } catch (error) {
         setLoading(false)
         console.log("Error getting location:", error)
@@ -348,9 +336,9 @@ export default function LocationScreen() {
     } catch (error) {
       setLoading(false)
       console.error("Start Journey Failed:", error)
-
+       Alert.alert("Error", "Failed to start journey")
       // For demo purposes, we'll proceed anyway
-      router.push("/booking/confirmed")
+      // router.push("/booking/confirmed")
     }
   }
 

@@ -19,7 +19,8 @@ interface TelemetryData {
 }
 
 export default function TrackingScreen() {
-  const { isJourneyStarted } = useJourney()
+  // const { isJourneyStarted } = useJourney()
+  const isJourneyStarted = true // For testing purposes, set to true
   
   if (!isJourneyStarted) {
     return (
@@ -169,7 +170,7 @@ return (
   <View style={[{ flex: 1, backgroundColor }]}>
     <StatusBar style={isDark ? "light" : "dark"} />
     <View style={styles.header}>
-    <Text style={[styles.headerTitle, { color: accentColor }]}>Drone Live Tracking</Text>
+    <Text style={[styles.headerTitle, { color: "#333"}]}>Drone Live Tracking</Text>
     </View>
 
  <View style={styles.mapContainer}>
@@ -287,18 +288,23 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    paddingTop: Platform.OS === "ios" ? 50 : 30,
+    paddingTop: Platform.OS === "ios" ? 50 : 50,
     alignItems: "center",
+    backgroundColor: "#30D5C8",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: "bold",
     fontFamily: "Inter-Bold",
   },
   mapContainer: {
     height: 300,
     width: "100%",
-    marginBottom: 10
+    marginBottom: 10,
+    marginTop: 10,
+    borderRadius:10
   },
   map: {
     ...StyleSheet.absoluteFillObject,

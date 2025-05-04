@@ -23,27 +23,28 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: {
           position: 'absolute',
-          bottom: 10,
+          bottom: 5,
           marginTop:20,
-          marginLeft: '5%',
-          width:'90%',
+          marginLeft: '2.5%',
+          width:'95%',
           height: 60,
           right: 16,
-          backgroundColor: 'white',
-          borderRadius: 30,
+          backgroundColor: "white",
+          borderRadius: 20,
           borderWidth: 5,
+          borderTopWidth:4,
 
           borderColor: '#30D5C8',
           padding:"10%",
           paddingVertical: 10,
           elevation: 10, // Android shadow
-          shadowColor: '#30D5C8',
-          shadowOpacity: 0.5,
-          shadowOffset: {width: 5, height: 5},
+          shadowColor: 'black',
+          shadowOpacity: 1,
+          shadowOffset: {width: 0, height: 5},
           shadowRadius: 10,
         },
-        tabBarActiveTintColor: "#30D5C8",      // Active icon & text color
-        tabBarInactiveTintColor: "#999",       // Inactive icon & text color
+        tabBarActiveTintColor: "black",      // Active icon & text color
+        tabBarInactiveTintColor: "gray",       // Inactive icon & text color
         tabBarLabelStyle: {
           fontSize: 10,
           marginBottom: 4,
@@ -59,6 +60,15 @@ export default function TabLayout() {
           ),
         }}
       />
+        <Tabs.Screen
+        name="command"
+        options={{
+          title: 'Control',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={26} name="settings" color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="tracking"
         options={{
@@ -68,15 +78,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="command"
-        options={{
-          title: 'Control',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="settings" color={color} />
-          ),
-        }}
-      />
+    
       <Tabs.Screen
         name="buy"
         options={{

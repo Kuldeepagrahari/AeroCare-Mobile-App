@@ -85,7 +85,7 @@ export default function BookingConfirmedScreen() {
   }
 
   const handleTrack = () => {
-    router.push("/(tabs)/tracking")
+    router.push("/(tabs)/command")
   }
 
   return (

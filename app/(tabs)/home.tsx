@@ -87,12 +87,16 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 50,
     borderBottomWidth: 1,
+    backgroundColor: "#30D5C8",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20
   },
   backButton: {
     padding: 5,
   },
   droneName: {
-    fontSize: 18,
+    fontSize: 25,
+  
     fontWeight: "bold",
     fontFamily: "Inter-Bold",
   },
