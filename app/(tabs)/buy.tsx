@@ -48,7 +48,7 @@ export default function DetailScreen() {
       
           <View style={styles.header}>
   <Text style={[styles.title, { color: isDark ? "#fff" : "#000" }]}>VTOL Drone</Text>
-  <Text style={[styles.price, { color: isDark ? "#fff" : "#000" }]}>3,00,000/-</Text>
+  <Text style={[styles.price, { color: isDark ? "#fff" : "#000" }]}>1,80,000/-</Text>
 </View>
 
 <View style={styles.ratingContainer}>
@@ -121,7 +121,7 @@ export default function DetailScreen() {
 
       <View style={[styles.footer, { backgroundColor: isDark ? "#1e1e1e" : "#fff" }]}>
         <TouchableOpacity style={[styles.addToCartButton, { backgroundColor: "#30D5C8" }]}>
-          <Text style={styles.addToCartText}>Add to Cart - {(300000 * quantity)} /- </Text>
+          <Text style={styles.addToCartText}>Add to Cart - {(180000 * quantity)} /- </Text>
         </TouchableOpacity>
       </View>
     </View>

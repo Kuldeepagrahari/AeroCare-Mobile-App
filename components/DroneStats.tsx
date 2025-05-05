@@ -23,13 +23,13 @@ export default function DroneStats({ battery, speed, range, wind }: DroneStatsPr
       <View style={styles.statsRow}>
         <View style={[styles.statItem, { backgroundColor }]}>
           <Ionicons name="battery-full" size={24} color={accentColor} />
-          <Text style={[styles.statLabel, { color: labelColor }]}>Battery</Text>
+          <Text style={[styles.statLabel, { color: labelColor }]}>Safe Battery</Text>
           <Text style={[styles.statValue, { color: textColor }]}>{battery}%</Text>
         </View>
 
         <View style={[styles.statItem, { backgroundColor }]}>
           <Ionicons name="speedometer" size={24} color={accentColor} />
-          <Text style={[styles.statLabel, { color: labelColor }]}>Speed</Text>
+          <Text style={[styles.statLabel, { color: labelColor }]}>Max Speed</Text>
           <Text style={[styles.statValue, { color: textColor }]}>{speed} km/h</Text>
         </View>
       </View>
@@ -37,13 +37,13 @@ export default function DroneStats({ battery, speed, range, wind }: DroneStatsPr
       <View style={styles.statsRow}>
         <View style={[styles.statItem, { backgroundColor }]}>
           <Ionicons name="globe" size={24} color={accentColor} />
-          <Text style={[styles.statLabel, { color: labelColor }]}>Range</Text>
+          <Text style={[styles.statLabel, { color: labelColor }]}>Max Range</Text>
           <Text style={[styles.statValue, { color: textColor }]}>{range} km</Text>
         </View>
 
         <View style={[styles.statItem, { backgroundColor }]}>
           <Ionicons name="thunderstorm" size={24} color={accentColor} />
-          <Text style={[styles.statLabel, { color: labelColor }]}>Wind</Text>
+          <Text style={[styles.statLabel, { color: labelColor }]}>Safe Wind</Text>
           <Text style={[styles.statValue, { color: textColor }]}>{wind} km/h</Text>
         </View>
       </View>

@@ -20,7 +20,7 @@ export default function HomeScreen() {
     name: "Protective Drone",
     description: "Scratch your protective drone to deliver Vaccines in minimum Cost and higher Speed",
     model: "Aviator Pro",
-    battery: 98,
+    battery: 90,
     speed: 46,
     range: 50,
     wind: 15,

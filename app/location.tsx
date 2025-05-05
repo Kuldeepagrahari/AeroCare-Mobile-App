@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Platform,
   Alert,
+  Switch
 } from "react-native"
 import { router } from "expo-router"
 import { StatusBar } from "expo-status-bar"
@@ -36,6 +37,7 @@ interface FormData {
 }
 
 export default function LocationScreen() {
+
   const { startJourney } = useJourney();
   const { isDark } = useTheme()
   const backgroundColor = isDark ? "#121212" : "#fff"
@@ -48,7 +50,7 @@ export default function LocationScreen() {
   const [feasibilityChecked, setFeasibilityChecked] = useState(false)
   const [showOrderDetails, setShowOrderDetails] = useState(false)
   const [btnTitle, setBtnTitle] = useState("Check Feasibility")
-
+  const [useCurrentLocationAsDestination, setUseCurrentLocationAsDestination] = useState(false);
   // Map state
   const [mapCenter, setMapCenter] = useState({
     latitude: 64.2008,
@@ -294,6 +296,46 @@ export default function LocationScreen() {
     }
   }
 
+  const setCurrentLocationAsDestination = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Location permission is required.');
+        return;
+      }
+  
+      const currentLocation = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = currentLocation.coords;
+  
+      const addresses = await Location.reverseGeocodeAsync({ latitude, longitude });
+  
+      if (addresses && addresses.length > 0) {
+        const address = addresses[0];
+        const formattedAddress = [address.name, address.street, address.city, address.region, address.country]
+          .filter(Boolean)
+          .join(", ");
+  
+        setFormData((prev) => ({
+          ...prev,
+          toLocation: formattedAddress,
+          toLat: latitude,
+          toLng: longitude,
+        }));
+  
+        setMapCenter({
+          latitude,
+          longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        });
+      }
+    } catch (error) {
+      console.log('Error getting current location:', error);
+      Alert.alert('Location Error', 'Failed to fetch your current location.');
+    }
+  };
+  
+
   // Proceed to order details
   const handleProceed = () => {
     if (!formData.temperature || !formData.altitude) {
@@ -443,6 +485,22 @@ export default function LocationScreen() {
             <Text style={[styles.inputHint, { color: isDark ? "#aaa" : "#666" }]}>
               Enter location and press return to search, or tap on the map
             </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 ,  paddingRight: 20, width: "90%"}}>
+           <Switch
+             value={useCurrentLocationAsDestination}
+            
+             onValueChange={async (val) => {
+             setUseCurrentLocationAsDestination(val);
+             if (val) {
+              await setCurrentLocationAsDestination();
+             }
+    }}
+  />
+           <Text style={{ marginLeft: 10, color: textColor }}>
+             Take my current location as destination address
+           </Text>
+          </View>
+
 
             {/* Critical Battery Input */}
             <Text style={[styles.inputLabel, { color: textColor }]}>Critical Battery (%)</Text>
@@ -598,14 +656,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
-    paddingTop: Platform.OS === "ios" ? 50 : 30,
+    paddingTop: Platform.OS === "ios" ? 50 : 50,
+    backgroundColor: "#30D5C8",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
     zIndex: 10,
   },
   backButton: {
     padding: 5,
   },
   title: {
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: "bold",
     fontFamily: "Inter-Bold",
   },
@@ -616,6 +677,7 @@ const styles = StyleSheet.create({
     height: 250,
     width: "100%",
     position: "relative",
+    marginTop: 10,
   },
   map: {
     ...StyleSheet.absoluteFillObject,

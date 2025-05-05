@@ -99,14 +99,7 @@ export default function CommandScreen() {
     }
   }
 
-  const handleRTL = () => {
-    try {
-      Alert.alert("RTL", "Return to launch initiated")
-    } catch (error) {
-      console.error("RTL failed", error)
-    }
-  }
-
+ 
   return (
  
   <ScreenWrapper>
@@ -120,7 +113,7 @@ export default function CommandScreen() {
           <ScrollView contentContainerStyle={styles.scrollContent}>
             
             <View style={styles.section}>
-              {/* <Text style={styles.sectionTitle}>Temperature Control</Text> */}
+             
               <View style={styles.temperatureContainer}>
                 <Slider
                   style={styles.slider}
@@ -148,10 +141,10 @@ export default function CommandScreen() {
                 <TouchableOpacity
                   style={[
                     styles.modeButton,
-                    mode === 'Takeoff' && styles.activeModeButton,
+                    mode === 'takeoff' && styles.activeModeButton,
                   ]}
                   onPress={() => {
-                    handleModeChange('Takeoff');
+                    handleModeChange('takeoff');
                     setTakeoff(true);
                   }}
                 >
@@ -162,7 +155,7 @@ export default function CommandScreen() {
               <TouchableOpacity
               style={[
                 styles.modeButton,
-                mode === 'Landing' && styles.activeModeButton,
+                mode === 'landing' && styles.activeModeButton,
               ]}
               onPress={() => {
                 handleModeChange('landing');
@@ -193,10 +186,10 @@ export default function CommandScreen() {
                 <TouchableOpacity
                   style={[
                     styles.modeButton,
-                    mode === 'Hovering' && styles.activeModeButton,
+                    mode === 'hovering' && styles.activeModeButton,
                   ]}
                   onPress={() => {
-                    handleModeChange('Hovering');
+                    handleModeChange('hovering');
                     setHover(true);
                   }}
                 >
