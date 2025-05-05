@@ -23,7 +23,7 @@ export default function DroneStats({ battery, speed, range, wind }: DroneStatsPr
       <View style={styles.statsRow}>
         <View style={[styles.statItem, { backgroundColor }]}>
           <Ionicons name="battery-full" size={24} color={accentColor} />
-          <Text style={[styles.statLabel, { color: labelColor }]}>Safe Battery</Text>
+          <Text style={[styles.statLabel, { color: labelColor }]}>Current Battery</Text>
           <Text style={[styles.statValue, { color: textColor }]}>{battery}%</Text>
         </View>
 

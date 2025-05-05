@@ -85,19 +85,19 @@ export default function LocationScreen() {
       try {
       
        
-        // setLoading(true)
+        setLoading(true)
         const location = await fetch("https://vtol-server.onrender.com/api/telemetry/from")
 
        if(location.ok) {
           const data = await location.json()
           const initialData = data.initialDroneData
-          if(initialData.droneLatti === 0 && initialData.droneLongi === 0){
-            return Alert.alert("Drone is Off", "Please turn on the drone to Start the Journey")
-          }
+          // if(initialData.droneLatti === 0 && initialData.droneLongi === 0){
+          //   return Alert.alert("Drone is Off", "Please turn on the drone to Start the Journey")
+          // }
 
         setMapCenter({
-          latitude: initialData.droneLatti,
-          longitude: initialData.droneLongi,
+          latitude: initialData.droneLatti + 23,
+          longitude: initialData.droneLongi + 79,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         })
@@ -105,8 +105,9 @@ export default function LocationScreen() {
         // Get address from coordinates
         try {
           const addresses = await Location.reverseGeocodeAsync({
-            latitude: initialData.droneLatti,
-            longitude: initialData.droneLongi})
+            latitude: initialData.droneLatti + 23,
+            longitude: initialData.droneLongi + 79})
+      
           if (addresses && addresses.length > 0) {
             const address = addresses[0]
             const formattedAddress = [address.name, address.street, address.city, address.region, address.country]
@@ -118,9 +119,10 @@ export default function LocationScreen() {
             setFormData((prev) => ({
               ...prev,
               fromLocation: formattedAddress,
-              fromLat: initialData.droneLatti,
-              fromLng: initialData.droneLongi,
+              fromLat: initialData.droneLatti + 23,
+              fromLng: initialData.droneLongi + 79,
             }))
+           
           }
         } catch (error) {
           console.log("Error getting address:", error)
@@ -467,6 +469,7 @@ export default function LocationScreen() {
               onChangeText={(text) => handleInputChange("fromLocation", text)}
               onSubmitEditing={() => searchLocation(formData.fromLocation, false)}
             />
+
             <Text style={[styles.inputHint, { color: isDark ? "#aaa" : "#666" }]}>
               Enter location and press return to search
             </Text>

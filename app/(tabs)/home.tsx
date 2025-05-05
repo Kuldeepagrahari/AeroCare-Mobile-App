@@ -1,6 +1,6 @@
 "use client"
-
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from "react-native"
+import { useState, useEffect } from "react"
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Alert} from "react-native"
 import { router } from "expo-router"
 import { StatusBar } from "expo-status-bar"
 import DroneStats from "@/components/DroneStats"
@@ -9,26 +9,46 @@ import { Ionicons } from "@expo/vector-icons"
 import BottomNavigation from "@/components/BottomNavigation"
 import ScreenWrapper from '@/components/ScreenWrapper';
 export default function HomeScreen() {
-  const { isDark } = useTheme()
+  // const { isDark } = useTheme() 
+  const isDark = false
   const backgroundColor = isDark ? "#121212" : "#fff"
   const textColor = isDark ? "#fff" : "#333"
   const secondaryTextColor = isDark ? "#aaa" : "#666"
   const borderColor = isDark ? "#333" : "#eee"
-
+  const [battery, setBattery] = useState(100)
   const drone = {
     id: "Syma W2",
     name: "Protective Drone",
     description: "Scratch your protective drone to deliver Vaccines in minimum Cost and higher Speed",
     model: "Aviator Pro",
-    battery: 90,
+    
     speed: 46,
     range: 50,
     wind: 15,
   }
+  const getbattery = async () => {
+    try {
+      const res = await fetch("https://vtol-server.onrender.com/api/telemetry/from")
+
+      if(res.ok){
+        const data = await res.json()
+        setBattery(data.initialDroneData.batterySOC)
+      }
+
+    } catch (error) {
+      Alert.alert("Error", "Failed to fetch battery data")
+    }
+  }
+  useEffect(() => {
+    
+    getbattery()
+  }
+  , [])
 
   const handleScheduleRide = () => {
     router.push("/location")
   }
+
 
   return (
     <ScreenWrapper>
@@ -45,10 +65,7 @@ export default function HomeScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* <View style={styles.droneTitle}>
-          <Text style={[styles.droneTitleText, { color: textColor }]}>{drone.name}</Text>
-          <Text style={[styles.droneDescription, { color: secondaryTextColor }]}>{drone.description}</Text>
-        </View> */}
+       
 
         <View style={styles.droneImageContainer}>
        
@@ -56,15 +73,9 @@ export default function HomeScreen() {
         
         </View>
 
-        {/* <View style={styles.batteryContainer}>
-          <Text style={[styles.batteryLabel, { color: textColor }]}>Battery</Text>
-          <View style={[styles.batteryBar, { backgroundColor: isDark ? "#333" : "#eee" }]}>
-            <View style={[styles.batteryLevel, { width: `${drone.battery}%` }]} />
-            <Text style={styles.batteryPercentage}>{drone.battery}%</Text>
-          </View>
-        </View> */}
+      
 
-        <DroneStats battery={drone.battery} speed={drone.speed} range={drone.range} wind={drone.wind} />
+        <DroneStats battery={battery} speed={drone.speed} range={drone.range} wind={drone.wind} />
 
         <TouchableOpacity style={styles.scheduleButton} onPress={handleScheduleRide}>
           <Text style={styles.scheduleButtonText}>Schedule a Ride</Text>

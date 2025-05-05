@@ -8,7 +8,8 @@ import { useTheme } from "@/components/ThemeProvider"
 import { Ionicons } from "@expo/vector-icons"
 import BottomNavigation from "@/components/BottomNavigation"
 export default function LoginScreen() {
-  const { isDark } = useTheme()
+  // const { isDark } = useTheme()
+  const isDark = false
   const backgroundColor = isDark ? "#121212" : "#fff"
   const textColor = isDark ? "#fff" : "#333"
   const inputBackgroundColor = isDark ? "#2a2a2a" : "#f5f5f5"

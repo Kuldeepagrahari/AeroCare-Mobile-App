@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useRef, useMemo } from "react"
@@ -32,7 +31,8 @@ export default function TrackingScreen() {
       </View>
     );
   }
-  const { isDark } = useTheme()
+  // const { isDark } = useTheme()
+  const isDark = false
   const backgroundColor = isDark ? "#121212" : "#fff"
   const textColor = isDark ? "#fff" : "#333"
   const secondaryTextColor = isDark ? "#aaa" : "#666"
@@ -61,7 +61,10 @@ export default function TrackingScreen() {
   })
 
   const [path, setPath] = useState<Array<{ latitude: number; longitude: number }>>([])
+
   const droneMarkerAnim = useRef(new Animated.Value(0)).current
+  const mapCenterAnim = useRef(new Animated.ValueXY({ x: position.latitude, y: position.longitude })).current
+  const hasSetWaypoints = useRef(false)
 
   useEffect(() => {
     const animation = Animated.loop(
@@ -83,68 +86,70 @@ export default function TrackingScreen() {
     return () => animation.stop(); // cleanup to avoid multiple loops
   }, [])
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchTelemetry();
+    }, 2000);
   
-    const centerRef = useRef({
-      latitude: position.latitude,
-      longitude: position.longitude,
-      latitudeDelta: 0.05,
-      longitudeDelta: 0.05,
-    });
-    
-    useEffect(() => {
-      const interval = setInterval(() => {
-        fetchTelemetry();
-      }, 2000);
-    
-      return () => clearInterval(interval);
-    }, []);
-    const fetchTelemetry = async () => {
-      try {
-        const response = await fetch("https://vtol-server.onrender.com/api/telemetry")
-        if (response.ok) {
-          const data = await response.json()
-          const configurations = data.configurations
-          const latestTelemetry = data.latestTelemetry
+    return () => clearInterval(interval);
+  }, []);
 
-          if (configurations && latestTelemetry) {
-            const { horizontalSpeed, verticalSpeed, battery, currLatti, currLongi, currAltitude } = latestTelemetry
-            const { sourceLatti, sourceLongi, destiLatti, destiLongi, temperature } = configurations
+  const fetchTelemetry = async () => {
+    try {
+      const response = await fetch("https://vtol-server.onrender.com/api/telemetry")
+      if (response.ok) {
+        const data = await response.json()
+        const configurations = data.configurations
+        const latestTelemetry = data.latestTelemetry
 
-      
-            setTelemetry(prev => {
-              const newTelemetry = {
-                range: calculateDistance(currLatti || sourceLatti, currLongi || sourceLongi, destiLatti, destiLongi),
-                battery,
-                temperature,
-                altitude: currAltitude,
-                horizontalSpeed,
-                verticalSpeed,
-                status: "In Transit",
-              };
-            
-              if (JSON.stringify(prev) !== JSON.stringify(newTelemetry)) {
-                return newTelemetry;
-              }
-              return prev;
-            });
-            
-            setPath([{
-              latitude: currLatti,
-              longitude: currLongi,
-            }])
-            if (currLatti && currLongi) {
-              setPosition({ latitude: currLatti, longitude: currLongi })
+        if (configurations && latestTelemetry) {
+          const { horizontalSpeed, verticalSpeed, battery, currLatti, currLongi, currAltitude, waypoints } = latestTelemetry
+          const { sourceLatti, sourceLongi, destiLatti, destiLongi, temperature } = configurations
+
+          setTelemetry(prev => {
+            const newTelemetry = {
+              range: calculateDistance(currLatti || sourceLatti, currLongi || sourceLongi, destiLatti, destiLongi),
+              battery,
+              temperature,
+              altitude: currAltitude,
+              horizontalSpeed,
+              verticalSpeed,
+              status: "In Transit",
+            };
+          
+            if (JSON.stringify(prev) !== JSON.stringify(newTelemetry)) {
+              return newTelemetry;
             }
+            return prev;
+          });
 
-            setDestination({ latitude: destiLatti, longitude: destiLongi })
+          if (!hasSetWaypoints.current && waypoints && Array.isArray(waypoints)) {
+            const waypointPath = waypoints.map((wp: any) => ({
+              latitude: wp.latitude,
+              longitude: wp.longitude,
+            }));
+            setPath(waypointPath);
+            hasSetWaypoints.current = true;
           }
-        }
-      } catch (error) {
-        console.error("Error fetching telemetry:", error)
-      }
-    }
 
-   
+          if (currLatti && currLongi) {
+            setPosition({ latitude: currLatti, longitude: currLongi })
+            // Animate map center to current position
+            Animated.timing(mapCenterAnim, {
+              toValue: { x: currLatti, y: currLongi },
+              duration: 1000,
+              useNativeDriver: false,
+            }).start();
+          }
+
+          setDestination({ latitude: destiLatti, longitude: destiLongi })
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching telemetry:", error)
+    }
+  }
+
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
     const toRad = (value: number) => (value * Math.PI) / 180
     const R = 6371
@@ -158,56 +163,59 @@ export default function TrackingScreen() {
     return (R * c).toFixed(2)
   }
 
-
   const droneScale = droneMarkerAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [1, 1.2],
   })
 
+  const center = {
+    latitude: mapCenterAnim.x.__getValue(),
+    longitude: mapCenterAnim.y.__getValue(),
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  }
 
-return (
+  return (
+    <View style={[{ flex: 1, backgroundColor }]}>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <View style={styles.header}>
+        <Text style={[styles.headerTitle, { color: "#333"}]}>Drone Live Tracking</Text>
+      </View>
 
-  <View style={[{ flex: 1, backgroundColor }]}>
-    <StatusBar style={isDark ? "light" : "dark"} />
-    <View style={styles.header}>
-    <Text style={[styles.headerTitle, { color: "#333"}]}>Drone Live Tracking</Text>
-    </View>
-
- <View style={styles.mapContainer}>
-    <MapViewAlternative
-    style={styles.map}
-    center={centerRef.current}
-    isDark={isDark}
-    markers={[
-      {
-        id: "origin",
-        position: { lat: path[0]?.latitude || position.latitude, lng: path[0]?.longitude || position.longitude },
-        title: "Origin",
-        color: "#4285F4",
-      },
-      {
-        id: "destination",
-        position: { lat: destination.latitude, lng: destination.longitude },
-        title: "Destination",
-        color: "#FF9800",
-      },
-      {
-        id: "drone",
-        position: { lat: position.latitude, lng: position.longitude },
-        title: "Drone",
-        color: "#30D5C8",
-      },
-    ]}
-    paths={[
-      {
-        id: "dronePath",
-        coordinates: path.map((p) => ({ lat: p.latitude, lng: p.longitude })),
-        strokeColor: "#30D5C8",
-        strokeWidth: 3,
-      },
-    ]}
-  />
-
+      <View style={styles.mapContainer}>
+        <MapViewAlternative
+          style={styles.map}
+          center={center}
+          isDark={isDark}
+          markers={[
+            {
+              id: "origin",
+              position: { lat: path[0]?.latitude || position.latitude, lng: path[0]?.longitude || position.longitude },
+              title: "Origin",
+              color: "#4285F4",
+            },
+            {
+              id: "destination",
+              position: { lat: destination.latitude, lng: destination.longitude },
+              title: "Destination",
+              color: "#FF9800",
+            },
+            {
+              id: "drone",
+              position: { lat: position.latitude, lng: position.longitude },
+              title: "Drone",
+              color: "#30D5C8",
+            },
+          ]}
+          paths={[
+            {
+              id: "dronePath",
+              coordinates: path.map((p) => ({ lat: p.latitude, lng: p.longitude })),
+              strokeColor: "#30D5C8",
+              strokeWidth: 3,
+            },
+          ]}
+        />
       </View>
 
       <ScrollView style={styles.telemetryContainer} showsVerticalScrollIndicator={false}>
@@ -246,10 +254,7 @@ return (
           </View>
         </View>
 
-
         <View style={styles.statusContainer}>
-          {/* <Text style={[styles.statusTitle, { color: textColor }]}>Delivery Status</Text> */}
-
           <View style={styles.statusTracker}>
             <View style={styles.statusStep}>
               <View style={[styles.statusDot, styles.completedDot]} />
@@ -275,10 +280,7 @@ return (
           </View>
         </View> 
       </ScrollView>
-      </View>
-     
-
-
+    </View>
   )
 }
 
@@ -416,7 +418,6 @@ const styles = StyleSheet.create({
   },
   estimatedTimeText: {
     marginLeft: 10,
-    fontSize: 16,
     fontFamily: "Inter-Regular",
   },
  

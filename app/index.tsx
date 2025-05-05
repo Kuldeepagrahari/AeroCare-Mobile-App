@@ -45,14 +45,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 40,
     fontWeight: "bold",
-    color: "#fff",
+    color: "black",
     fontFamily: "Inter-Bold",
   },
   subtitle: {
     fontSize: 20,
-    color: "white",
+    color: "black",
     opacity: 1,
     textAlign: "center",
     fontFamily: "Inter-Regular",
+    textAlignVertical:"center",
+    width: "80%",
+    // paddingLeft:"10%"
+
   },
 })

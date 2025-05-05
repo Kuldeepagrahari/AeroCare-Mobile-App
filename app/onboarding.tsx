@@ -72,7 +72,7 @@ export default function OnboardingScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       {/* <View style={styles.header}>
         <Text style={styles.headerTitle}>AeroCare</Text>
         <Text style={styles.headerSubtitle}>Swift. Safe. Life-Saving Deliveries</Text>
