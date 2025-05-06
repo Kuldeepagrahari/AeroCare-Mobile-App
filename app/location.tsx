@@ -83,52 +83,54 @@ export default function LocationScreen() {
   useEffect(() => {
     const getCurrentLocation = async () => {
       try {
-      
-       
+
+
         setLoading(true)
         const location = await fetch("https://vtol-server.onrender.com/api/telemetry/from")
 
-       if(location.ok) {
+        if (location.ok) {
           const data = await location.json()
           const initialData = data.initialDroneData
           // if(initialData.droneLatti === 0 && initialData.droneLongi === 0){
           //   return Alert.alert("Drone is Off", "Please turn on the drone to Start the Journey")
           // }
 
-        setMapCenter({
-          latitude: initialData.droneLatti + 23,
-          longitude: initialData.droneLongi + 79,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        })
+          setMapCenter({
+            latitude: initialData.droneLatti || 23.180141,
+            longitude: initialData.droneLongi || 80.026866,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          })
 
-        // Get address from coordinates
-        try {
-          const addresses = await Location.reverseGeocodeAsync({
-            latitude: initialData.droneLatti + 23,
-            longitude: initialData.droneLongi + 79})
-      
-          if (addresses && addresses.length > 0) {
-            const address = addresses[0]
-            const formattedAddress = [address.name, address.street, address.city, address.region, address.country]
-              .filter(Boolean)
-              .join(", ")
+          // Get address from coordinates
+          try {
+            const addresses = await Location.reverseGeocodeAsync({
+              latitude: initialData.droneLatti || 23.180141,
+              longitude: initialData.droneLongi || 80.026866
+            })
 
-         
-          
-            setFormData((prev) => ({
-              ...prev,
-              fromLocation: formattedAddress,
-              fromLat: initialData.droneLatti + 23,
-              fromLng: initialData.droneLongi + 79,
-            }))
-           
+            if (addresses && addresses.length > 0) {
+              const address = addresses[0]
+              const formattedAddress = [address.name, address.street, address.city, address.region, address.country]
+                .filter(Boolean)
+                .join(", ")
+
+
+
+              setFormData((prev) => ({
+                ...prev,
+                fromLocation: formattedAddress,
+                fromLat: initialData.droneLatti || 23.180141,
+                fromLng: initialData.droneLongi || 80.026866,
+              }))
+
+            }
+          } catch (error) {
+            console.log("Error getting address:", error)
           }
-        } catch (error) {
-          console.log("Error getting address:", error)
-        }
 
-        setLoading(false)}
+          setLoading(false)
+        }
       } catch (error) {
         setLoading(false)
         console.log("Error getting location:", error)
@@ -138,8 +140,8 @@ export default function LocationScreen() {
 
     getCurrentLocation()
   }, [])
- 
-  
+
+
   // Search for a location using Google Places API
   const searchLocation = async (query: string, isDestination: boolean) => {
     if (!query.trim()) return
@@ -258,11 +260,11 @@ export default function LocationScreen() {
           destiLatti: formData.toLat,
         }),
       })
-  
+
 
 
       const data = await response.json()
- 
+
 
       setLoading(false)
 
@@ -273,7 +275,7 @@ export default function LocationScreen() {
         Alert.alert(
           "Feasibility Check Failed",
           `We can't cover this much distance\nBattery: ${data.batterySoC}%\nDistance: ${data.distance?.toFixed(2)} km ${data}`,
-       
+
         )
       }
     } catch (error) {
@@ -305,25 +307,25 @@ export default function LocationScreen() {
         Alert.alert('Permission Denied', 'Location permission is required.');
         return;
       }
-  
+
       const currentLocation = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = currentLocation.coords;
-  
+
       const addresses = await Location.reverseGeocodeAsync({ latitude, longitude });
-  
+
       if (addresses && addresses.length > 0) {
         const address = addresses[0];
         const formattedAddress = [address.name, address.street, address.city, address.region, address.country]
           .filter(Boolean)
           .join(", ");
-  
+
         setFormData((prev) => ({
           ...prev,
           toLocation: formattedAddress,
           toLat: latitude,
           toLng: longitude,
         }));
-  
+
         setMapCenter({
           latitude,
           longitude,
@@ -336,7 +338,7 @@ export default function LocationScreen() {
       Alert.alert('Location Error', 'Failed to fetch your current location.');
     }
   };
-  
+
 
   // Proceed to order details
   const handleProceed = () => {
@@ -380,7 +382,7 @@ export default function LocationScreen() {
     } catch (error) {
       setLoading(false)
       console.error("Start Journey Failed:", error)
-       Alert.alert("Error", "Failed to start journey")
+      Alert.alert("Error", "Failed to start journey")
       // For demo purposes, we'll proceed anyway
       // router.push("/booking/confirmed")
     }
@@ -410,38 +412,38 @@ export default function LocationScreen() {
           markers={[
             ...(formData.fromLat && formData.fromLng
               ? [
-                  {
-                    id: "origin",
-                    position: { lat: formData.fromLat, lng: formData.fromLng },
-                    title: "Origin",
-                    color: "#4285F4",
-                  },
-                ]
+                {
+                  id: "origin",
+                  position: { lat: formData.fromLat, lng: formData.fromLng },
+                  title: "Origin",
+                  color: "#4285F4",
+                },
+              ]
               : []),
             ...(formData.toLat && formData.toLng
               ? [
-                  {
-                    id: "destination",
-                    position: { lat: formData.toLat, lng: formData.toLng },
-                    title: "Destination",
-                    color: "#FF9800",
-                  },
-                ]
+                {
+                  id: "destination",
+                  position: { lat: formData.toLat, lng: formData.toLng },
+                  title: "Destination",
+                  color: "#FF9800",
+                },
+              ]
               : []),
           ]}
           paths={
             formData.fromLat && formData.fromLng && formData.toLat && formData.toLng
               ? [
-                  {
-                    id: "route",
-                    coordinates: [
-                      { lat: formData.fromLat, lng: formData.fromLng },
-                      { lat: formData.toLat, lng: formData.toLng },
-                    ],
-                    strokeColor: "#007bff",
-                    strokeWidth: 4,
-                  },
-                ]
+                {
+                  id: "route",
+                  coordinates: [
+                    { lat: formData.fromLat, lng: formData.fromLng },
+                    { lat: formData.toLat, lng: formData.toLng },
+                  ],
+                  strokeColor: "#007bff",
+                  strokeWidth: 4,
+                },
+              ]
               : []
           }
           onMapPress={handleMapPress}
@@ -484,25 +486,25 @@ export default function LocationScreen() {
               onChangeText={(text) => handleInputChange("toLocation", text)}
               onSubmitEditing={() => searchLocation(formData.toLocation, true)}
             />
-         
+
             <Text style={[styles.inputHint, { color: isDark ? "#aaa" : "#666" }]}>
               Enter location and press return to search, or tap on the map
             </Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 ,  paddingRight: 20, width: "90%"}}>
-           <Switch
-             value={useCurrentLocationAsDestination}
-            
-             onValueChange={async (val) => {
-             setUseCurrentLocationAsDestination(val);
-             if (val) {
-              await setCurrentLocationAsDestination();
-             }
-    }}
-  />
-           <Text style={{ marginLeft: 10, color: textColor }}>
-             Take my current location as destination address
-           </Text>
-          </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10, paddingRight: 20, width: "90%" }}>
+              <Switch
+                value={useCurrentLocationAsDestination}
+
+                onValueChange={async (val) => {
+                  setUseCurrentLocationAsDestination(val);
+                  if (val) {
+                    await setCurrentLocationAsDestination();
+                  }
+                }}
+              />
+              <Text style={{ marginLeft: 10, color: textColor }}>
+                Take my current location as destination address
+              </Text>
+            </View>
 
 
             {/* Critical Battery Input */}

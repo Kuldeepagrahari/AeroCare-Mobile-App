@@ -51,20 +51,17 @@ export default function TrackingScreen() {
   })
 
   const [position, setPosition] = useState({
-    latitude: 25.4358,
-    longitude: 81.8463,
+    latitude: 23.180141,
+    longitude: 80,
   })
 
   const [destination, setDestination] = useState({
-    latitude: 25.4358,
-    longitude: 81.9463,
+    latitude: 23.180141,
+    longitude: 80.026866,
   })
-
-  const [path, setPath] = useState<Array<{ latitude: number; longitude: number }>>([])
 
   const droneMarkerAnim = useRef(new Animated.Value(0)).current
   const mapCenterAnim = useRef(new Animated.ValueXY({ x: position.latitude, y: position.longitude })).current
-  const hasSetWaypoints = useRef(false)
 
   useEffect(() => {
     const animation = Animated.loop(
@@ -103,12 +100,12 @@ export default function TrackingScreen() {
         const latestTelemetry = data.latestTelemetry
 
         if (configurations && latestTelemetry) {
-          const { horizontalSpeed, verticalSpeed, battery, currLatti, currLongi, currAltitude, waypoints } = latestTelemetry
+          const { horizontalSpeed, verticalSpeed, battery, currLatti, currLongi, currAltitude } = latestTelemetry
           const { sourceLatti, sourceLongi, destiLatti, destiLongi, temperature } = configurations
 
           setTelemetry(prev => {
             const newTelemetry = {
-              range: calculateDistance(currLatti || sourceLatti, currLongi || sourceLongi, destiLatti, destiLongi),
+              range: calculateDistance(currLatti || sourceLatti || position.latitude, currLongi || sourceLongi || position.longitude, destiLatti || destination.latitude, destiLongi || destination.longitude),
               battery,
               temperature,
               altitude: currAltitude,
@@ -122,15 +119,6 @@ export default function TrackingScreen() {
             }
             return prev;
           });
-
-          if (!hasSetWaypoints.current && waypoints && Array.isArray(waypoints)) {
-            const waypointPath = waypoints.map((wp: any) => ({
-              latitude: wp.latitude,
-              longitude: wp.longitude,
-            }));
-            setPath(waypointPath);
-            hasSetWaypoints.current = true;
-          }
 
           if (currLatti && currLongi) {
             setPosition({ latitude: currLatti, longitude: currLongi })
@@ -190,7 +178,7 @@ export default function TrackingScreen() {
           markers={[
             {
               id: "origin",
-              position: { lat: path[0]?.latitude || position.latitude, lng: path[0]?.longitude || position.longitude },
+              position: { lat: position.latitude, lng: position.longitude },
               title: "Origin",
               color: "#4285F4",
             },
@@ -210,7 +198,10 @@ export default function TrackingScreen() {
           paths={[
             {
               id: "dronePath",
-              coordinates: path.map((p) => ({ lat: p.latitude, lng: p.longitude })),
+              coordinates: [
+                { lat: position.latitude, lng: position.longitude },
+                { lat: destination.latitude, lng: destination.longitude },
+              ],
               strokeColor: "#30D5C8",
               strokeWidth: 3,
             },
