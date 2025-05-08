@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useMemo } from "react"
-import { View, Text, StyleSheet, ScrollView, Animated, Platform } from "react-native"
+import { View, Text, StyleSheet, ScrollView, Animated, Platform, Alert } from "react-native"
 import { StatusBar } from "expo-status-bar"
 import { useTheme } from "@/components/ThemeProvider"
 import MapViewAlternative from "@/components/MapViewAlternate"
@@ -63,6 +63,7 @@ export default function TrackingScreen() {
   const droneMarkerAnim = useRef(new Animated.Value(0)).current
   const mapCenterAnim = useRef(new Animated.ValueXY({ x: position.latitude, y: position.longitude })).current
 
+
   useEffect(() => {
     const animation = Animated.loop(
       Animated.sequence([
@@ -122,12 +123,6 @@ export default function TrackingScreen() {
 
           if (currLatti && currLongi) {
             setPosition({ latitude: currLatti, longitude: currLongi })
-            // Animate map center to current position
-            Animated.timing(mapCenterAnim, {
-              toValue: { x: currLatti, y: currLongi },
-              duration: 1000,
-              useNativeDriver: false,
-            }).start();
           }
 
           setDestination({ latitude: destiLatti, longitude: destiLongi })
@@ -162,6 +157,27 @@ export default function TrackingScreen() {
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   }
+  //update current temperature
+  const [curTemperature, setCurTemperature] = useState(telemetry.temperature)
+  const CurrentTemperature = async () => {
+    try {
+      const response = await fetch("https://vtol-server.onrender.com/api/telemetry")
+      if(response.ok){
+        const curTemp = await response.json()
+        setCurTemperature(curTemp)
+      }
+
+    } catch (error) {
+      Alert.alert(`Erro in temp update ${error}`)
+    }
+  }
+  useEffect(() => {
+    const interval = setInterval(() => {
+      CurrentTemperature();
+    }, 2000);
+  
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <View style={[{ flex: 1, backgroundColor }]}>
@@ -223,7 +239,7 @@ export default function TrackingScreen() {
 
           <View style={[styles.telemetryItem, { backgroundColor: cardBackgroundColor }]}>
             <Text style={[styles.telemetryLabel, { color: secondaryTextColor }]}>Temperature</Text>
-            <Text style={[styles.telemetryValue, { color: textColor }]}>{telemetry.temperature}°C</Text>
+            <Text style={[styles.telemetryValue, { color: textColor }]}>{curTemperature}°C</Text>
           </View>
         </View>
 
