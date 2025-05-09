@@ -59,7 +59,7 @@ export default function TrackingScreen() {
     latitude: 23.180141,
     longitude: 80.026866,
   })
-
+  const [curTemperature, setCurTemperature] = useState(-1)
   const droneMarkerAnim = useRef(new Animated.Value(0)).current
   const mapCenterAnim = useRef(new Animated.ValueXY({ x: position.latitude, y: position.longitude })).current
 
@@ -101,7 +101,7 @@ export default function TrackingScreen() {
         const latestTelemetry = data.latestTelemetry
 
         if (configurations && latestTelemetry) {
-          const { horizontalSpeed, verticalSpeed, battery, currLatti, currLongi, currAltitude } = latestTelemetry
+          const { horizontalSpeed, verticalSpeed, battery, currLatti, currLongi, currAltitude, temp } = latestTelemetry
           const { sourceLatti, sourceLongi, destiLatti, destiLongi, temperature } = configurations
 
           setTelemetry(prev => {
@@ -114,7 +114,7 @@ export default function TrackingScreen() {
               verticalSpeed,
               status: "In Transit",
             };
-          
+            setCurTemperature(temp)
             if (JSON.stringify(prev) !== JSON.stringify(newTelemetry)) {
               return newTelemetry;
             }
@@ -157,27 +157,6 @@ export default function TrackingScreen() {
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   }
-  //update current temperature
-  const [curTemperature, setCurTemperature] = useState(telemetry.temperature)
-  const CurrentTemperature = async () => {
-    try {
-      const response = await fetch("https://vtol-server.onrender.com/api/telemetry")
-      if(response.ok){
-        const curTemp = await response.json()
-        setCurTemperature(curTemp)
-      }
-
-    } catch (error) {
-      Alert.alert(`Erro in temp update ${error}`)
-    }
-  }
-  useEffect(() => {
-    const interval = setInterval(() => {
-      CurrentTemperature();
-    }, 2000);
-  
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <View style={[{ flex: 1, backgroundColor }]}>
@@ -218,7 +197,7 @@ export default function TrackingScreen() {
                 { lat: position.latitude, lng: position.longitude },
                 { lat: destination.latitude, lng: destination.longitude },
               ],
-              strokeColor: "#30D5C8",
+              strokeColor: "black",
               strokeWidth: 3,
             },
           ]}
@@ -239,7 +218,8 @@ export default function TrackingScreen() {
 
           <View style={[styles.telemetryItem, { backgroundColor: cardBackgroundColor }]}>
             <Text style={[styles.telemetryLabel, { color: secondaryTextColor }]}>Temperature</Text>
-            <Text style={[styles.telemetryValue, { color: textColor }]}>{curTemperature}°C</Text>
+            {curTemperature < 0 ? <Text>Loading...</Text> : 
+            <Text style={[styles.telemetryValue, { color: textColor }]}>{curTemperature}°C</Text>}
           </View>
         </View>
 
@@ -250,14 +230,14 @@ export default function TrackingScreen() {
           </View>
 
           <View style={[styles.telemetryItem, { backgroundColor: cardBackgroundColor }]}>
-            <Text style={[styles.telemetryLabel, { color: secondaryTextColor }]}>Horizontal Speed</Text>
+            <Text style={[styles.telemetryLabel, { color: secondaryTextColor }]}>H-Speed</Text>
             <Text style={[styles.telemetryValue, { color: textColor }]}>
               {telemetry.horizontalSpeed.toFixed(2)} m/s
             </Text>
           </View>
           <View style={[styles.telemetryItem, { backgroundColor: cardBackgroundColor }]}>
-            <Text style={[styles.telemetryLabel, { color: secondaryTextColor }]}>Vertical Speed</Text>
-            <Text style={[styles.telemetryValue, { color: textColor }]}>{telemetry.verticalSpeed.toFixed(2)} m/s</Text>
+            <Text style={[styles.telemetryLabel, { color: secondaryTextColor }]}>V-Speed</Text>
+            <Text style={[styles.telemetryValue, { color: textColor }]}>{telemetry.verticalSpeed.toFixed(2) < "0" ? 0 : telemetry.verticalSpeed.toFixed(2)} m/s</Text>
           </View>
         </View>
 
