@@ -1,6 +1,6 @@
 # AeroCare VTOL Drone – Mobile App (Frontend)
 💡 *Empowering rural healthcare with fast, autonomous, and reliable drone logistics.*
-**Role:** Software Developer  
+
 **Duration:** August 2024 – Present  
 **Organization:** District Industries Centre (DIC) – Govt. of India Initiative  
 
